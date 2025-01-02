@@ -1,10 +1,9 @@
 import subprocess
 
 # Define the valid options
-# valid_nps_features = ["ECFP", "ASP", "PubChem"]
-valid_nps_features = ["PubChem"]
+valid_nps_features = ["ECFP", "ASP", "PubChem"]
 valid_proteins_features = ["DPC", "CTriad", "AAC"]
-valid_models = ["SGD"]
+valid_models = ["RF", "XGBoost", "AdaBoost", "LR", "SGD", "KNN"]
 n_folds_values = [5]  # Add more fold options if needed
 
 

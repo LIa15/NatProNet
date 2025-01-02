@@ -34,7 +34,7 @@ def compound_clustering(input_file):
         print('thre', thre, 'total num of compounds', len(ligand_list), 'num of clusters', max(C_clusters), 'max length', max(len_list))
         C_cluster_dict = {ligand_list[i]: C_clusters[i] for i in range(len(ligand_list))}
 
-        # 确保目录存在
+        # Ensure the directory exists
         os.makedirs(os.path.dirname('data/nps_feature/drug_cluster_{}.pkl'.format(thre)), exist_ok=True)
 
         with open('data/nps_feature/drug_cluster_{}.pkl'.format(thre), 'wb') as f:
@@ -42,6 +42,6 @@ def compound_clustering(input_file):
 
 
 if __name__ == "__main__":
-    input_data_path = "./data/nps_file_6.csv"
+    input_data_path = "./data/dataset1_nps.csv"
     compound_clustering(input_data_path)
 

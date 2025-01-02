@@ -3,16 +3,16 @@ import pandas as pd
 
 
 def read_mean_rows_from_csvs(directory):
-    # 存储结果的列表
-    header_name = ["model", "nps_feature", "protein_feature","Accuracy", "Precision", "Recall", "F1 Score", "AUC", "Specificity"]
+    # List to store results
+    header_name = ["model", "nps_feature", "protein_feature", "Accuracy", "Precision", "Recall", "F1 Score", "AUC", "Specificity"]
     data = []
-    # 遍历目录下所有文件
+    # Iterate through all files in the directory
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
             file_info = filename.split("_")[:3]
             file_path = os.path.join(directory, filename)
             try:
-                # 读取 CSV 文件
+                # Read the CSV file
                 df = pd.read_csv(file_path, index_col=0)
 
                 last_row = (df.iloc[-1].values).tolist()
@@ -26,6 +26,5 @@ def read_mean_rows_from_csvs(directory):
 
 
 if __name__ == "__main__":
-    # 使用示例
-    directory = "./results/"  # 替换为你的目录路径
+    directory = "./results/"
     results = read_mean_rows_from_csvs(directory)

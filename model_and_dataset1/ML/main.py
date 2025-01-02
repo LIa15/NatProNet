@@ -20,7 +20,7 @@ def model_select(model):
     elif model == "AdaBoost":
         return AdaBoostClassifier(learning_rate=1.0, n_estimators=100)
     elif model == "LR":
-        return LogisticRegression(max_iter=5000,penalty="l2")
+        return LogisticRegression(max_iter=5000, penalty="l2")
     elif model == "SGD":
         return SGDClassifier(loss="log_loss", penalty="l1")
     elif model == "KNN":
@@ -39,10 +39,8 @@ def model_select(model):
         return None
 
 
-
-# 定义函数用于加载数据和构造特征
+# Define a function to load data and construct features
 def load_and_process_data(file_path, nps_dic, protein_dic, columns=None):
-    """加载数据并构造特征矩阵"""
     data = pd.read_csv(file_path, header=None)
     if columns is None:
         columns = [0, 2, 4]
@@ -52,7 +50,7 @@ def load_and_process_data(file_path, nps_dic, protein_dic, columns=None):
     proteins = selected_data[columns[1]].values
     labels = selected_data[columns[2]].values
 
-    # 矢量化构造特征矩阵
+    # Vectorize and construct the feature matrix
     features = np.array([
         np.concatenate((nps_dic[np_id], protein_dic[prot_id]))
         for np_id, prot_id in zip(nps, proteins)
@@ -62,19 +60,6 @@ def load_and_process_data(file_path, nps_dic, protein_dic, columns=None):
 
 
 def cross_validate_model(nps_feature, proteins_feature, n_folds, model_cls, output_dir="./results"):
-    """
-    Perform cross-validation for a given model and save the results.
-
-    Parameters:
-        nps_feature (str): Feature type for natural products (e.g., "PubChem").
-        proteins_feature (str): Feature type for proteins (e.g., "DPC").
-        n_folds (int): Number of cross-validation folds.
-        model_cls (str): Machine learning model (e.g., RF).
-        output_dir (str): Directory to save the results.
-
-    Returns:
-        pd.DataFrame: DataFrame containing the evaluation metrics for each fold.
-    """
     # Load features
     with open(f"../data/nps_feature/drug_{nps_feature}.pkl", 'rb') as file:
         nps_dic = pickle.load(file)
