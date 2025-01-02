@@ -8,10 +8,10 @@ import os
 
 if __name__ == "__main__":
     # File name
-    source_data = "../data/dataset1.csv"
+    source_data = "../data/dataset2.csv"
     # Activity threshold selection
     cutoff_value = 5
-    cluster_data = "../data/nps_feature/drug_cluster_0.3.pkl"
+    cluster_data = "../data/nps_feature/drug_cluster_non_weak_0.3.pkl"
     random_seed = 1234
     n_folds = 5
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read the CSV file, specifying that it does not contain a header (header=None)
-df = pd.read_csv('data/dataset1.csv', header=None)
+df = pd.read_csv('data/dataset2.csv', header=None)
 
 # Define a cutoff value to categorize the numeric column
 cutoff_value = 5
@@ -19,7 +19,7 @@ selected_columns.loc[:, 4] = selected_columns[4].apply(lambda x: 0 if x < cutoff
 
 # Save the processed data to a new text file, using a space as the delimiter
 # The filename includes the cutoff_value to indicate the applied threshold
-selected_columns.to_csv('data/dataset1_cutoff_{}.txt'.format(cutoff_value), sep=' ', index=False, header=False)
+selected_columns.to_csv('data/dataset2_cutoff_{}.txt'.format(cutoff_value), sep=' ', index=False, header=False)
 
 # Print a confirmation message indicating that the data has been successfully saved
 print("Data has been saved to the file.")

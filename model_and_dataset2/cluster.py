@@ -37,11 +37,11 @@ def compound_clustering(input_file):
         # Ensure the directory exists
         os.makedirs(os.path.dirname('data/nps_feature/drug_cluster_{}.pkl'.format(thre)), exist_ok=True)
 
-        with open('data/nps_feature/drug_cluster_{}.pkl'.format(thre), 'wb') as f:
+        with open('data/nps_feature/drug_cluster_non_weak_{}.pkl'.format(thre), 'wb') as f:
             pickle.dump(C_cluster_dict, f, protocol=0)
 
 
 if __name__ == "__main__":
-    input_data_path = "./data/dataset1_nps.csv"
+    input_data_path = "./data/dataset2_nps.csv"
     compound_clustering(input_data_path)
 
