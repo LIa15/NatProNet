@@ -1,1 +1,1 @@
-Additionally, there are three files: `protein_CTriad.pkl`, `protein_DPC.pkl`, and `protein_AAC.pkl`. These files store the features of proteins in our dataset. The format is a Python dictionary, where the key represents the UniProt ID, and the value contains the feature values.
+There are three files: `protein_CTriad.pkl`, `protein_DPC.pkl`, and `protein_AAC.pkl`. These files store the features of proteins in our dataset. The format is a Python dictionary, where the key represents the UniProt ID, and the value contains the feature values.

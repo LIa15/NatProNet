@@ -9,7 +9,7 @@ import os
 
 if __name__ == "__main__":
     # File name
-    source_data = "../data/nps_protein_interactions_median_np_6.csv"
+    source_data = "../data/dataset1.csv"
     # Active threshold selection
     cutoff_value = 5
     cluster_data = "../data/nps_feature/drug_cluster_0.3.pkl"
