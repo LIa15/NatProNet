@@ -1,32 +1,33 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 import numpy as np
-from torch_geometric.nn import TopKPooling
-from torch_geometric.nn import global_mean_pool as gap, global_max_pool as gmp
-import torch.nn.functional as F
 from typing import Optional
-
-import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import GRUCell, Linear, Parameter
-
-from torch_geometric.nn import GATConv, MessagePassing, global_add_pool
+from torch_geometric.nn import GATConv, global_add_pool
 from torch_geometric.nn.inits import glorot, zeros
 from torch_geometric.typing import Adj, OptTensor
 from torch_geometric.utils import softmax
 import torch
-
-from torch_geometric.utils import add_self_loops, degree, remove_self_loops
 from torch_geometric.nn import MessagePassing
-from transformers import XLNetModel, BertTokenizer, pipeline, BertModel, AlbertModel
 import esm
-import math
+from torch_geometric.nn.models import AttentiveFP
+
 
 device = torch.device('cuda')
 esm_model, alphabet = esm.pretrained.esm2_t30_150M_UR50D()
+
+
+# The GATEConv and AttentiveFP layers are taken from the PyTorch Geometric (PyG) version 2.7.0 documentation.
+# Since my experimental environment uses a lower version of PyTorch, I was concerned about potential compatibility
+# issues with newer versions of PyG. Therefore, I ported the source code from the higher version to my setup.
+# In the latest version of PyG, you can directly
+# import AttentiveFP from torch_geometric.nn.models.
+# The Attentive FP model for molecular representation learning from the
+#     `"Pushing the Boundaries of Molecular Representation for Drug Discovery
+#     with the Graph Attention Mechanism"
+#     <https://pubs.acs.org/doi/10.1021/acs.jmedchem.9b00959>`_ paper, based on
+#     graph attention mechanisms.
 
 
 class GATEConv(MessagePassing):
@@ -64,10 +65,7 @@ class GATEConv(MessagePassing):
         out = out + self.bias
         return out
 
-    def message(self, x_j: Tensor, x_i: Tensor, edge_attr: Tensor,
-                index: Tensor, ptr: OptTensor,
-                size_i: Optional[int]) -> Tensor:
-
+    def message(self, x_j: Tensor, x_i: Tensor, edge_attr: Tensor, index: Tensor, ptr: OptTensor, size_i: Optional[int]) -> Tensor:
         x_j = F.leaky_relu_(self.lin1(torch.cat([x_j, edge_attr], dim=-1)))
         alpha_j = (x_j @ self.att_l.t()).squeeze(-1)
         alpha_i = (x_i @ self.att_r.t()).squeeze(-1)
@@ -79,23 +77,6 @@ class GATEConv(MessagePassing):
 
 
 class AttentiveFP(torch.nn.Module):
-    r"""The Attentive FP model for molecular representation learning from the
-    `"Pushing the Boundaries of Molecular Representation for Drug Discovery
-    with the Graph Attention Mechanism"
-    <https://pubs.acs.org/doi/10.1021/acs.jmedchem.9b00959>`_ paper, based on
-    graph attention mechanisms.
-
-    Args:
-        in_channels (int): Size of each input sample.
-        hidden_channels (int): Hidden node feature dimensionality.
-        out_channels (int): Size of each output sample.
-        edge_dim (int): Edge feature dimensionality.
-        num_layers (int): Number of GNN layers.
-        num_timesteps (int): Number of iterative refinement steps for global
-            readout.
-        dropout (float, optional): Dropout probability. (default: :obj:`0.0`)
-
-    """
     def __init__(
         self,
         in_channels: int,
@@ -197,46 +178,6 @@ class AttentiveFP(torch.nn.Module):
                 f'num_timesteps={self.num_timesteps}'
                 f')')
 
-class CNN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, max_seq_len, kernels, dropout_rate=0.1):
-        super(CNN, self).__init__()
-
-        self.dropout_rate = dropout_rate
-        self.protein_Oridim = input_dim
-        self.feature_size = hidden_dim
-        self.max_seq_len = max_seq_len
-        self.kernels = kernels
-        self.out_features = output_dim
-
-        self.protein_embed = nn.Embedding(self.protein_Oridim, self.feature_size, padding_idx=0)
-
-        self.convs = nn.ModuleList([
-            nn.Sequential(nn.Conv1d(in_channels=self.feature_size,
-                                    out_channels=self.feature_size,
-                                    kernel_size=ks),
-                          nn.ReLU(),
-                          nn.MaxPool1d(kernel_size=self.max_seq_len - ks + 1)
-                          )
-            for ks in self.kernels
-        ])
-        self.fc = nn.Linear(in_features=self.feature_size * len(self.kernels),
-                            out_features=self.out_features)
-        self.dropout = nn.Dropout(p=self.dropout_rate)
-
-    def forward(self, x):
-        # print(x.size())
-        x = self.protein_embed(x)
-        # print(x.size())
-        embedding_x = x.permute(0, 2, 1)
-
-        out = [conv(embedding_x) for conv in self.convs]
-        out = torch.cat(out, dim=1)
-        out = out.view(-1, out.size(1))
-        out = self.dropout(input=out)
-        out = self.fc(out)
-        # print(out.size())
-        return out
-
 
 def GNN(layers):
     return AttentiveFP(in_channels=39,
@@ -260,14 +201,13 @@ class Classifier(nn.Module):
         self.layers.append(nn.Linear(prev_dim, outDim))
 
     def forward(self, compound_feature, protein_feature):
-        # 假设compound和protein已经被适当处理，可以直接拼接
-        # print("compound.shape", compound.size())
-        # print("protein", protein.size())
+        # Assume that the compound and protein have already been properly processed and can be directly concatenated
         x = torch.cat((compound_feature, protein_feature), dim=1)
         for layer in self.layers[:-1]:
             x = F.relu(layer(x))
         x = self.layers[-1](x)
         return x
+
 
 
 class FlexibleNNClassifier(nn.Module):
@@ -296,12 +236,8 @@ class FlexibleNNClassifier(nn.Module):
         return out
 
     def __call__(self, data, proteins, train=True):
-
-        # inputs = data.x, data.edge_index, data.protein
         correct_interaction = data.y
-
         predicted_interaction = self.forward(data, proteins)
-
         if train:
             criterion = torch.nn.CrossEntropyLoss().to(device)
             loss = criterion(predicted_interaction, correct_interaction)

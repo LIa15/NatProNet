@@ -1,21 +1,13 @@
-from collections import defaultdict
 import os
-import pickle
-import sys
 import torch
 import numpy as np
-from scipy.sparse import coo_matrix
 from torch_geometric.data import Data
 from rdkit import Chem
 from tqdm import tqdm
-from transformers import BertModel, BertTokenizer, XLNetTokenizer
-from torch_geometric.data import DataLoader
-import re
-import random
 import esm
 
 
-model, alphabet = esm.pretrained.esm2_t30_150M_UR50D()  # esm1_t6_43M_UR50S esm_msa1b_t12_100M_UR50S esm1b_t33_650M_UR50S
+model, alphabet = esm.pretrained.esm2_t30_150M_UR50D()
 batch_converter = alphabet.get_batch_converter()
 
 def one_of_k_encoding(x, allowable_set):
@@ -26,7 +18,6 @@ def one_of_k_encoding(x, allowable_set):
 
 
 def one_of_k_encoding_unk(x, allowable_set):
-    """Maps inputs not in the allowable set to the last element."""
     if x not in allowable_set:
         x = allowable_set[-1]
     return [int(x == s) for s in allowable_set]
@@ -129,9 +120,7 @@ def smiles_to_graph(smiles, explicit_H=False, use_chirality=True):
     edge_index = torch.tensor([row, col], dtype=torch.long)
     all_atom_feature = torch.tensor(np.array(all_atom_feature), dtype=torch.float)
     all_bond_feature = torch.tensor(np.array(all_bond_feature), dtype=torch.float)
-    # print("x", all_atom_feature.size())
-    # print("edge_index", edge_index.size())
-    # print("edge_attr", all_bond_feature.size())
+
     return all_atom_feature, edge_index, all_bond_feature
 
 
@@ -141,10 +130,10 @@ if __name__ == "__main__":
     for i in range(1, n_fold + 1):
 
         with open(f'./dataset/fold_{i}/train_data.txt', 'r') as f:
-            data_list_train = f.read().strip().split('\n')  # strip去除首尾空格
+            data_list_train = f.read().strip().split('\n')  # strip removes leading and trailing spaces
 
         with open(f'./dataset/fold_{i}/test_data.txt', 'r') as f:
-            data_list_test = f.read().strip().split('\n')  # strip去除首尾空格
+            data_list_test = f.read().strip().split('\n')  # strip removes leading and trailing spaces
         len_train = len(data_list_train)
         len_test = len(data_list_test)
 
@@ -155,19 +144,19 @@ if __name__ == "__main__":
         max_len = 0
         min_len = 99999
         count  = 0
-        print(f"正在处理第{i}flod的数据")
+        print(f"Processing data for fold {i}")
         for no, data in enumerate(tqdm((data_list))):
             smiles, sequence, interaction = data.strip().split()
 
-            count+=1
+            count += 1
 
-            if max_len<len(sequence):
+            if max_len < len(sequence):
                 max_len = len(sequence)
-            if min_len>len(sequence):
+            if min_len > len(sequence):
                 min_len = len(sequence)
 
             max_length = 4000
-            if len(sequence)>max_length:
+            if len(sequence) > max_length:
                 sequence = sequence[:max_length]
 
             all_atom_feature, edge_index, all_bond_feature = smiles_to_graph(smiles)
@@ -192,6 +181,5 @@ if __name__ == "__main__":
         torch.save(dataset_test, dir_input + f'drug-target_test_esm_4000_{i}' + ".pt")
 
 
-        print(f'The preprocess of fold_{i} has finished!')
+        print(f'The preprocessing of fold {i} has finished!')
         # break
-

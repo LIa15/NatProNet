@@ -6,7 +6,6 @@ import torch
 
 
 class RAdam(Optimizer):
-
     def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, degenerated_to_sgd=False):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -107,6 +106,7 @@ class Lookahead(Optimizer):
         self.alpha = alpha
         self.param_groups = self.optimizer.param_groups
         self.state = defaultdict(dict)
+        # self.defaults={}
         self.fast_state = self.optimizer.state
         for group in self.param_groups:
             group["counter"] = 0
