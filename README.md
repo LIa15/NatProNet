@@ -51,7 +51,7 @@ This begins the training process.
 
 ## Machine Learning Task (NatProNet)
 
-进入./model_and_dataset1/ML/目录，执行:
+Enter the ./model_and_dataset1/ML/ directory and run:
 
 ```shell
 # Splits the dataset based on the clustering results of natural products.
