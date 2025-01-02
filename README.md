@@ -49,7 +49,7 @@ python main.py
 
 This begins the training process.
 
-## Machine Learning Task (NatProNet)
+## Machine Learning Task
 
 Enter the ./model_and_dataset1/ML/ directory and run:
 
