@@ -11,7 +11,7 @@ from torch_geometric.utils import softmax
 import torch
 from torch_geometric.nn import MessagePassing
 import esm
-from torch_geometric.nn.models import AttentiveFP
+# from torch_geometric.nn.models import AttentiveFP
 
 
 device = torch.device('cuda')
