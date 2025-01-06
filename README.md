@@ -1,5 +1,3 @@
-Some bugs occurred while optimizing the code, and they are being fixed.
-
 # NatProNet
 
 ## Overview
