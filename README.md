@@ -1,3 +1,5 @@
+Bug Fixes: On January 7, 2025, fixed the issue of importing a non-existent AttentiveFP module in DL/main.py during runtime, and resolved the problem of the missing optim module.
+
 # NatProNet
 
 ## Overview
@@ -63,6 +65,4 @@ python main.py -nps_feature ECFP -proteins_feature DPC -model RF
 # Batch training
 python run.py
 ```
-
-
 
