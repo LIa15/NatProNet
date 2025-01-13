@@ -1,5 +1,6 @@
 # Note: 
 1、Bug Fixes: On January 7, 2025, fixed the issue of importing a non-existent AttentiveFP module in DL/main.py during runtime, and resolved the problem of the missing optim module.
+
 2、When using other public datasets for experiments, certain compounds may fail to convert properly into graph formats, resulting in errors during training. Examples include [SH-].[K+].[K+], S, and [Fe].
 
 # NatProNet
